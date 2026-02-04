@@ -1,0 +1,133 @@
+# Development Environment Configuration
+# Telangana Ball Badminton Association Website Backend
+
+spring:
+  # Database Configuration - PostgreSQL for Development
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:telangana_ball_badminton_dev}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+  
+  # Alternative MySQL Configuration (commented out)
+  # datasource:
+  #   url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:telangana_ball_badminton_dev}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  #   username: ${DB_USERNAME:root}
+  #   password: ${DB_PASSWORD:password}
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration for Development
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # Use create-drop for development, validate for production
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  
+  # Redis Configuration for Development
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  # H2 Console for Development (if needed)
+  h2:
+    console:
+      enabled: false # Set to true if using H2 for quick development
+  
+  # Development Mail Configuration (using MailHog or similar)
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+# Server Configuration for Development
+server:
+  port: 8080
+  error:
+    include-stacktrace: always
+    include-message: always
+
+# Logging Configuration for Development
+logging:
+  level:
+    com.telangana.ballbadminton: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.cache: DEBUG
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+
+# Application Specific Configuration for Development
+app:
+  # JWT Configuration for Development
+  jwt:
+    secret: dev-telangana-ball-badminton-association-secret-key-2024-not-for-production
+    expiration: 86400000 # 24 hours
+    refresh-expiration: 604800000 # 7 days
+  
+  # File Storage Configuration for Development
+  file:
+    upload-dir: ./uploads/dev
+    max-size: 10485760 # 10MB
+    allowed-types: jpg,jpeg,png,gif,pdf,doc,docx,txt
+  
+  # CORS Configuration for Development (more permissive)
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:4200,http://localhost:8080
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+  
+  # Rate Limiting for Development (more lenient)
+  rate-limit:
+    enabled: false # Disabled for development
+    requests-per-minute: 1000
+    burst-capacity: 2000
+
+# Management and Monitoring for Development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # Expose all endpoints in development
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true # Allow graceful shutdown in development
+
+# API Documentation for Development
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    try-it-out-enabled: true
+  api-docs:
+    enabled: true

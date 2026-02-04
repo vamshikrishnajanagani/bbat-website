@@ -1,0 +1,29 @@
+# Robots.txt for Telangana Ball Badminton Association Website
+# https://telanganaballbadminton.org/robots.txt
+
+User-agent: *
+Allow: /
+
+# Disallow admin and authentication pages
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Allow search engines to crawl all public content
+Allow: /members
+Allow: /players
+Allow: /tournaments
+Allow: /districts
+Allow: /news
+Allow: /media
+Allow: /contact
+
+# Sitemap location
+Sitemap: https://telanganaballbadminton.org/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

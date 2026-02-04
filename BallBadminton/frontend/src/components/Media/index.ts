@@ -1,0 +1,1 @@
+export { MediaGalleryView } from './MediaGalleryView';

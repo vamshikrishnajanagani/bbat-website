@@ -1,0 +1,188 @@
+# Production Environment Configuration
+# Telangana Ball Badminton Association Website Backend
+
+spring:
+  # Database Configuration - PostgreSQL for Production
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+      max-lifetime: 1800000
+  
+  # JPA Configuration for Production
+  jpa:
+    hibernate:
+      ddl-auto: validate # Never auto-create/drop in production
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+  
+  # Redis Configuration for Production
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: 0
+      timeout: 2000ms
+      ssl: ${REDIS_SSL:false}
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2000ms
+  
+  # Production Mail Configuration
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: ${MAIL_HOST}
+
+# Server Configuration for Production
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEY_STORE:}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:}
+    key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
+
+# Logging Configuration for Production
+logging:
+  level:
+    com.telangana.ballbadminton: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.springframework.cache: WARN
+    root: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:/var/log/telangana-ball-badminton/application.log}
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 1GB
+  logback:
+    rollingpolicy:
+      clean-history-on-start: true
+
+# Application Specific Configuration for Production
+app:
+  # JWT Configuration for Production
+  jwt:
+    secret: ${JWT_SECRET} # Must be provided via environment variable
+    expiration: ${JWT_EXPIRATION:3600000} # 1 hour in production
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000} # 24 hours
+  
+  # File Storage Configuration for Production
+  file:
+    upload-dir: ${FILE_UPLOAD_DIR:/var/uploads/telangana-ball-badminton}
+    max-size: ${FILE_MAX_SIZE:5242880} # 5MB in production
+    allowed-types: jpg,jpeg,png,gif,pdf,doc,docx
+  
+  # CORS Configuration for Production (restrictive)
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS} # Must be provided via environment variable
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: Authorization,Content-Type,X-Requested-With
+    allow-credentials: true
+    max-age: 3600
+  
+  # Rate Limiting for Production
+  rate-limit:
+    enabled: true
+    requests-per-minute: ${RATE_LIMIT_RPM:30}
+    burst-capacity: ${RATE_LIMIT_BURST:60}
+
+# Management and Monitoring for Production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        step: 60s
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 50ms,100ms,200ms,300ms,500ms,1s,2s
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+    git:
+      mode: full
+
+# API Documentation for Production
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false} # Disabled by default in production
+    path: /swagger-ui.html
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:false} # Disabled by default in production
+
+# Security Headers for Production
+security:
+  headers:
+    frame-options: DENY
+    content-type-options: nosniff
+    xss-protection: 1; mode=block
+    referrer-policy: strict-origin-when-cross-origin
+    content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;

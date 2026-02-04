@@ -1,0 +1,101 @@
+# Test Environment Configuration
+# Telangana Ball Badminton Association Website Backend
+
+spring:
+  # H2 In-Memory Database for Testing
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # JPA Configuration for Testing
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  
+  # H2 Console for Testing
+  h2:
+    console:
+      enabled: true
+  
+  # Redis Configuration for Testing (embedded)
+  data:
+    redis:
+      host: localhost
+      port: 6370 # Different port for test Redis
+      database: 1
+  
+  # Cache Configuration for Testing
+  cache:
+    type: simple # Use simple cache for testing
+  
+  # Mail Configuration for Testing (disabled)
+  mail:
+    host: localhost
+    port: 3025
+    username: test
+    password: test
+
+# Server Configuration for Testing
+server:
+  port: 0 # Random port for testing
+
+# Logging Configuration for Testing
+logging:
+  level:
+    com.telangana.ballbadminton: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.test: DEBUG
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p) %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+
+# Application Specific Configuration for Testing
+app:
+  # JWT Configuration for Testing
+  jwt:
+    secret: test-secret-key-for-testing-only-not-secure
+    expiration: 3600000 # 1 hour
+    refresh-expiration: 7200000 # 2 hours
+  
+  # File Storage Configuration for Testing
+  file:
+    upload-dir: ./test-uploads
+    max-size: 1048576 # 1MB for testing
+    allowed-types: jpg,jpeg,png,gif,pdf,txt
+  
+  # CORS Configuration for Testing
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:4200
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+  
+  # Rate Limiting for Testing (disabled)
+  rate-limit:
+    enabled: false
+
+# Management Configuration for Testing
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# API Documentation for Testing
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
